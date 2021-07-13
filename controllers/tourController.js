@@ -12,6 +12,16 @@ exports.checkID = (req, res, next, val) => {
   next();
 };
 
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Missing name or price!',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -43,7 +53,7 @@ exports.postAllTours = (req, res) => {
     JSON.stringify(tours),
     (err) => {
       if (err) {
-        throw err;
+        console.log(err);
       }
       res.status(201).json({
         status: 'success',
