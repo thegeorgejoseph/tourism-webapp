@@ -1,5 +1,13 @@
 {
   "extends": ["airbnb", "prettier", "plugin:node/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    }
+  },
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
