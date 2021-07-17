@@ -12,13 +12,20 @@ exports.checkID = (req, res, next, val) => {
   next();
 };
 
-exports.getAllTours = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: { tours: tours },
-  });
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: { tours: tours },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'failed',
+      message: err,
+    });
+  }
 };
 
 exports.createTour = async (req, res) => {
@@ -35,21 +42,49 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.getTour = (req, res) => {
-  res.status(500).json({ status: 'failed', message: 'Not yet implemented' });
+exports.getTour = async (req, res) => {
+  try {
+    // const id = req.params.id
+    const tour = await Tour.findById({ id: req.params.id });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ status: 'failed', message: err });
+  }
 };
-exports.patchTour = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: 'UpdatedTourGoesHere',
-    },
-  });
+exports.patchTour = async (req, res) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    console.log(tour);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour: tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      message: err,
+    });
+  }
 };
 
-exports.deleteTour = (req, res) => {
-  res.status(204).json({
-    staus: 'success',
-    data: null,
-  });
+exports.deleteTour = async (req, res) => {
+  try {
+    await Tour.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      staus: 'success',
+      data: null,
+    });
+  } catch (err) {
+    res.status(404).json({ status: 'failed', message: err });
+  }
 };
