@@ -14,7 +14,12 @@ exports.checkID = (req, res, next, val) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const exclude = ['page', 'sort', 'limit'];
+    const queryObj = { ...req.query };
+    exclude.forEach((val) => delete queryObj[val]);
+    // console.log(req.query, queryObj);
+    const query = Tour.find(queryObj);
+    const tours = await query;
     res.status(200).json({
       status: 'success',
       results: tours.length,
