@@ -14,14 +14,21 @@ exports.checkID = (req, res, next, val) => {
 
 exports.getAllTours = async (req, res) => {
   try {
-    const exclude = ['page', 'sort', 'limit'];
+    const exclude = ['page', 'sort', 'limit', 'fields'];
     const queryObj = { ...req.query };
     exclude.forEach((val) => delete queryObj[val]);
     // console.log(req.query, queryObj);
-    queryStr = JSON.stringify(queryObj);
+    let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     // console.log(JSON.parse(queryStr));
-    const query = Tour.find(JSON.parse(queryStr));
+    console.log(req.query);
+    let query = Tour.find(JSON.parse(queryStr));
+    if (req.query.sort) {
+      const sorter = req.query.sort.split(',').join(' ');
+      query = query.sort(sorter);
+    } else {
+      query = query.sort('-createdAt');
+    }
     const tours = await query;
     res.status(200).json({
       status: 'success',
