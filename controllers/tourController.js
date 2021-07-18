@@ -18,7 +18,10 @@ exports.getAllTours = async (req, res) => {
     const queryObj = { ...req.query };
     exclude.forEach((val) => delete queryObj[val]);
     // console.log(req.query, queryObj);
-    const query = Tour.find(queryObj);
+    queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // console.log(JSON.parse(queryStr));
+    const query = Tour.find(JSON.parse(queryStr));
     const tours = await query;
     res.status(200).json({
       status: 'success',
