@@ -4,6 +4,12 @@ const Tour = require('../models/tourModels');
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
 const tours = []; //temp
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 exports.checkID = (req, res, next, val) => {
   console.log(`Tour id is: ${val}`);
   if (parseInt(req.params.id, 10) > tours.length) {
