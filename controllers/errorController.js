@@ -42,6 +42,12 @@ const sendErrorProd = (err, res) => {
   }
 };
 
+const handleJWTError = () =>
+  new AppError('Invalid Token Please Log In Again', 401);
+
+const handleTokenExpiredError = () =>
+  new AppError('Request timeout. Please try again', 401);
+
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
@@ -52,6 +58,8 @@ module.exports = (err, req, res, next) => {
     if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDupsFieldsDB(error);
+    if (err.name === 'JsonWebTokenError') error = handleJWTError();
+    if (err.name === 'TokenExpiredError') error = handleTokenExpiredError();
     sendErrorProd(error, res);
   }
 };
