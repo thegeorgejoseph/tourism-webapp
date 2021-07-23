@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router.post('/signup', authController.signup); // according to REST philosophy the name of the route should not explain what that api does, I guess for security reasons but sometimes its okay
-
+router.post('/login', authController.login);
 router
   .route('/')
   .get(userController.getAllUsers)
