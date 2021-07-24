@@ -73,3 +73,15 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = freshUser;
   next();
 });
+
+//middlewares cannot have parameters so we use closures to pass it down
+exports.restrict =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You dont have permission to perform this action!', 403)
+      );
+    }
+    next();
+  };
