@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema({
   passwordResetExpired: Date,
 });
 
+//validate and .pre middlewares only work on CREATE and SAVE, so don't use findbyIdAndUpdate for password related stuff. save manually
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
@@ -50,6 +51,7 @@ userSchema.pre('save', async function (next) {
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
+  next();
 });
 
 userSchema.methods.correctPassword = async function (
