@@ -85,3 +85,14 @@ exports.restrict =
     }
     next();
   };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    next(new AppError('User does not exist', 404));
+  }
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+});
+exports.resetPassword = (req, res, next) => {};
