@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
+const crypto = require('crypto');
 
 const signToken = (id) =>
   jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -114,11 +115,37 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     });
   } catch (err) {
     user.createPasswordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    user.passwordResetExpired = undefined;
     user.save({ validateBeforeSave: false });
 
     return next(new AppError('Error sending the email, try again later', 500));
   }
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex'); // since the route has /:token it can be accessed using req.params
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpired: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new AppError('Token has expired or is invalid', 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpired = undefined;
+  await user.save(); // now we want to run validators so dont mention validateBeforeSave
+
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});

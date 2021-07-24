@@ -47,6 +47,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+});
+
 userSchema.methods.correctPassword = async function (
   // instance methods are available on all documents present in a collection
   candidatePassword,
@@ -75,7 +80,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
   this.passwordResetExpired = Date.now() + 10 * 60 * 1000;
-  // console.log({ resetToken }, this.passwordResetToken);
+  console.log({ resetToken }, this.passwordResetToken);
   return resetToken;
 };
 const User = mongoose.model('User', userSchema);
