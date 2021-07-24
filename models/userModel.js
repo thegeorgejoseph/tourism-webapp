@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: { type: Date },
   passwordResetToken: String,
   passwordResetExpired: Date,
+  active: { type: Boolean, default: true, select: false },
 });
 
 //validate and .pre middlewares only work on CREATE and SAVE, so don't use findbyIdAndUpdate for password related stuff. save manually
@@ -53,6 +54,11 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+}); //QueryMiddleware that executes before any query function that starts with Find, findAndUpdate etc.
 
 userSchema.methods.correctPassword = async function (
   // instance methods are available on all documents present in a collection
