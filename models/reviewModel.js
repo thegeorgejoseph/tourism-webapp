@@ -35,5 +35,13 @@ const reviewSchema = new mongoose.Schema(
   } // virtual options show the properties that are created during runtime by code to show up in the response rather than just the schema ones!
 );
 
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'tours',
+  }).populate({
+    path: 'users',
+  });
+  next();
+});
 const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;
