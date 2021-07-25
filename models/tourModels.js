@@ -90,7 +90,13 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    //Array - for embedding
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -105,11 +111,13 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-tourSchema.pre('save', async function (next) {
-  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guidesPromises);
-  next();
-});
+//used for embedding
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
 // tourSchema.post('save', (doc, next) => {
 //   console.log(doc);
 //   next();
@@ -117,8 +125,16 @@ tourSchema.pre('save', async function (next) {
 
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-  next();
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v',
+  });
+  next();
 });
 
 tourSchema.post(/^find/, function (docs, next) {
