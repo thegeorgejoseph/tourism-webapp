@@ -14,14 +14,14 @@ const reviewSchema = new mongoose.Schema(
       max: 5,
     },
     createdAt: { type: Date, default: Date.now() },
-    tours: [
+    tour: [
       {
         type: mongoose.Schema.ObjectId,
         ref: 'Tour',
         required: [true, 'Review must belong to a tour'],
       },
     ],
-    users: [
+    user: [
       {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
@@ -36,10 +36,14 @@ const reviewSchema = new mongoose.Schema(
 );
 
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: 'tour',
+  // }).populate({
+  //   path: 'user',
+  // });
+  //turning populate of tour off because of virtual populate on tour makes the response too big
   this.populate({
-    path: 'tours',
-  }).populate({
-    path: 'users',
+    path: 'user',
   });
   next();
 });
