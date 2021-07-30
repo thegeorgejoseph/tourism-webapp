@@ -157,11 +157,12 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 //aggregation middleware
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this.pipeline());
-  next();
-});
+//turning this off because geospatial querying requires Geonear to be the first in the pipeline but this adds match to it all causing an unknown error
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
