@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -10,7 +11,11 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views')); // the path library helps prevent bugs of / or not
 
 app.use(helmet()); // set security HTTP headers
 
@@ -47,7 +52,8 @@ app.use(
   })
 );
 //serving static files present in the public directory
-app.use(express.static(`${__dirname}/public`));
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use((req, res, next) => {
 //   console.log('Hello from the middleware!');
