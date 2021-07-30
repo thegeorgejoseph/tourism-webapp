@@ -105,6 +105,8 @@ const tourSchema = new mongoose.Schema(
 // tourSchema.index({ price: 1 }); // creating an index for the schema
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' }); // geospatial queries require special indexes
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });

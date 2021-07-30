@@ -21,6 +21,11 @@ router
   .get(tourController.aliasTopTours, tourController.getAllTours);
 
 router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+router
   .route('/')
   .get(authController.protect, tourController.getAllTours)
   .post(
