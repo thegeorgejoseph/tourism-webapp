@@ -35,6 +35,8 @@ const reviewSchema = new mongoose.Schema(
   } // virtual options show the properties that are created during runtime by code to show up in the response rather than just the schema ones!
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true }); //each combination of tour and user must be unique - meaning one user can only make one review on a tour
+
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
   //   path: 'tour',
