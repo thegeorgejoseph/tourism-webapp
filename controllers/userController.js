@@ -26,6 +26,8 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.file);
+  console.log(req.body);
   // create error if user POSTS password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError('You cannot update the password here', 400));
